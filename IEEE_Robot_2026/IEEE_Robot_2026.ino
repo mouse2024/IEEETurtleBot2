@@ -30,6 +30,8 @@ void setup() {
 
   servos.begin();
   servos.setPWMFreq(SERVO_FREQ);
+  servos.setPWM(0, 0, SERVOMAX);
+  servos.setPWM(1, 0, SERVOMIN);
 }
 
 void loop() {
@@ -87,16 +89,10 @@ void setRelay(int setting) {
 
 void turnServos(int direction) {
   if (direction == 0) {
-    for (int pulselen = SERVOMIN; pulselen < SERVOMAX; pulselen++) {
-      servos.setPWM(1, 0, SERVOMAX - pulselen);
-      servos.setPWM(0, 0, pulselen);
-      delay(15);
-    }
+    servos.setPWM(0, 0, SERVOMIN);
+    servos.setPWM(1, 0, SERVOMAX);
   } else if (direction == 1) {
-    for (int pulselen = SERVOMIN; pulselen < SERVOMAX; pulselen++) {
-      servos.setPWM(1, 0, pulselen);
-      servos.setPWM(0, 0, SERVOMAX - pulselen);
-      delay(15);
-    }
+    servos.setPWM(0, 0, SERVOMAX);
+    servos.setPWM(1, 0, SERVOMIN);
   }
 }
