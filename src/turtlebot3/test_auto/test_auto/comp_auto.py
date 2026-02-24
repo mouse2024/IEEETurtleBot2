@@ -57,7 +57,7 @@ class Turtlebot3RelativeMove(Node):
         return deg * 3.141592 / 180
 
     #I am not dealing with more python nonsense, just go with it
-    states = [(intom(12), 0, 0, "x"), (intom(12), 0, degtorad(-90), "theta"), (intom(12), intom(12), degtorad(-90), "y"), (intom(12), intom(12), degtorad(-180), "theta"), (0, intom(12), degtorad(-180), "x"), (0, intom(12), degtorad(90), "theta"), (0, 0, degtorad(90), "y"), (0, 0, 0, "theta")]
+    states = [(intom(12), 0, 0, "x"), (intom(12), 0, degtorad(-90), "theta"), (intom(12), intom(12), degtorad(-90), "y"), (intom(12), intom(12), degtorad(-90), "theta"), (0, intom(12), degtorad(-180), "x"), (0, intom(12), degtorad(90), "theta"), (0, 0, degtorad(90), "y"), (0, 0, 0, "theta")]
     state = 0
 
     def __init__(self):
@@ -125,11 +125,11 @@ class Turtlebot3RelativeMove(Node):
             self.get_logger().info('no new odom')
             return
         if not self.get_key_state:
-            #since its converting relative to absolute x, y, theta anyway, just use absolute? also to decrease error
-            self.goal_pose_x, self.goal_pose_y, self.goal_pose_theta = self.states[self.state][0:3]
-            #input_x, input_y, input_theta = self.states[self.state][0:3]
+            #self.goal_pose_x, self.goal_pose_y, self.goal_pose_theta = self.states[self.state][0:3]
+            input_x, input_y, input_theta = self.states[self.state][0:3]
+            
             self.get_logger().info('set goal poses')
-            '''input_x_global = ( #idk this math exactly
+            input_x_global = ( #converting local input into global frame (i guess this will help)
                 math.cos(self.last_pose_theta) * input_x - math.sin(self.last_pose_theta) * input_y
             )
             input_y_global = (
@@ -138,7 +138,7 @@ class Turtlebot3RelativeMove(Node):
 
             self.goal_pose_x = self.last_pose_x + input_x_global
             self.goal_pose_y = self.last_pose_y + input_y_global
-            self.goal_pose_theta = self.last_pose_theta + input_theta'''
+            self.goal_pose_theta = self.last_pose_theta + input_theta
             self.get_key_state = True #this indicates if we have new user input to move based on
 
         else:
