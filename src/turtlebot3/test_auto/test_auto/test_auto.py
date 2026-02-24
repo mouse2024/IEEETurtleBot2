@@ -76,7 +76,7 @@ class Turtlebot3RelativeMove(Node):
         super().__init__('turtlebot3_relative_move') #its parent/super() is node
 
         self.segment = 0 #idk when these numbers increase
-        self.segments = [(0, 0, 1.7), (0.25, 0, 0), (0, 0, 3.14), (0.25, 0, 0)] #starting step, but ill let it count up
+        self.segments = [(0, 0, 1.6), (0.25, 0, 0), (0, 0, 3.14), (0.25, 0, 0)] #starting step, but ill let it count up
         #self.segments = [(2, .25, 0, 0), (3, 0, 0, 1.7), (2, .1, 0, 0), (3, 0, 0, 1.7), (2, .25, 0, 0), (3, 0, 0, -1.7)]
 
         self.odom = Odometry()

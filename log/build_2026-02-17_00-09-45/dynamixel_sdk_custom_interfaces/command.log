@@ -1,0 +1,1 @@
+Invoking command in '/home/robotics/desktop_ws/IEEETurtleBot2/build/dynamixel_sdk_custom_interfaces': /usr/bin/cmake /home/robotics/desktop_ws/IEEETurtleBot2/src/DynamixelSDK/ros/dynamixel_sdk_custom_interfaces -DCMAKE_INSTALL_PREFIX=/home/robotics/desktop_ws/IEEETurtleBot2/install/dynamixel_sdk_custom_interfaces

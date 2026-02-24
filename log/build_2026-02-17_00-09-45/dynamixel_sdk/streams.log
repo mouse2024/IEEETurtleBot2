@@ -1,0 +1,33 @@
+[0.130s] Invoking command in '/home/robotics/desktop_ws/IEEETurtleBot2/build/dynamixel_sdk': /usr/bin/cmake /home/robotics/desktop_ws/IEEETurtleBot2/src/DynamixelSDK/ros/dynamixel_sdk -DCMAKE_INSTALL_PREFIX=/home/robotics/desktop_ws/IEEETurtleBot2/install/dynamixel_sdk
+[0.832s] -- The C compiler identification is GNU 11.4.0
+[1.494s] -- The CXX compiler identification is GNU 11.4.0
+[1.591s] -- Detecting C compiler ABI info
+[2.386s] -- Detecting C compiler ABI info - done
+[2.472s] -- Check for working C compiler: /usr/bin/cc - skipped
+[2.478s] -- Detecting C compile features
+[2.482s] -- Detecting C compile features - done
+[2.518s] -- Detecting CXX compiler ABI info
+[3.553s] -- Detecting CXX compiler ABI info - done
+[3.631s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[3.633s] -- Detecting CXX compile features
+[3.639s] -- Detecting CXX compile features - done
+[4.023s] [31mCMake Error at CMakeLists.txt:18 (find_package):
+[4.024s]   By not providing "Findament_cmake.cmake" in CMAKE_MODULE_PATH this project
+[4.025s]   has asked CMake to find a package configuration file provided by
+[4.026s]   "ament_cmake", but CMake did not find one.
+[4.027s] 
+[4.028s]   Could not find a package configuration file provided by "ament_cmake" with
+[4.030s]   any of the following names:
+[4.031s] 
+[4.032s]     ament_cmakeConfig.cmake
+[4.033s]     ament_cmake-config.cmake
+[4.039s] 
+[4.041s]   Add the installation prefix of "ament_cmake" to CMAKE_PREFIX_PATH or set
+[4.042s]   "ament_cmake_DIR" to a directory containing one of the above files.  If
+[4.043s]   "ament_cmake" provides a separate development package or SDK, be sure it
+[4.044s]   has been installed.
+[4.045s] 
+[4.065s] [0m
+[4.066s] -- Configuring incomplete, errors occurred!
+[4.067s] See also "/home/robotics/desktop_ws/IEEETurtleBot2/build/dynamixel_sdk/CMakeFiles/CMakeOutput.log".
+[4.069s] Invoked command in '/home/robotics/desktop_ws/IEEETurtleBot2/build/dynamixel_sdk' returned '1': /usr/bin/cmake /home/robotics/desktop_ws/IEEETurtleBot2/src/DynamixelSDK/ros/dynamixel_sdk -DCMAKE_INSTALL_PREFIX=/home/robotics/desktop_ws/IEEETurtleBot2/install/dynamixel_sdk

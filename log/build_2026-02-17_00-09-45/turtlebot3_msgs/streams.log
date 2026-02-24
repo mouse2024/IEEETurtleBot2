@@ -1,0 +1,32 @@
+[0.128s] Invoking command in '/home/robotics/desktop_ws/IEEETurtleBot2/build/turtlebot3_msgs': /usr/bin/cmake /home/robotics/desktop_ws/IEEETurtleBot2/src/turtlebot3_msgs -DCMAKE_INSTALL_PREFIX=/home/robotics/desktop_ws/IEEETurtleBot2/install/turtlebot3_msgs
+[0.861s] -- The C compiler identification is GNU 11.4.0
+[1.509s] -- The CXX compiler identification is GNU 11.4.0
+[1.604s] -- Detecting C compiler ABI info
+[2.451s] -- Detecting C compiler ABI info - done
+[2.537s] -- Check for working C compiler: /usr/bin/cc - skipped
+[2.540s] -- Detecting C compile features
+[2.544s] -- Detecting C compile features - done
+[2.583s] -- Detecting CXX compiler ABI info
+[3.789s] -- Detecting CXX compiler ABI info - done
+[3.872s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[3.875s] -- Detecting CXX compile features
+[3.879s] -- Detecting CXX compile features - done
+[4.264s] [31mCMake Error at CMakeLists.txt:18 (find_package):
+[4.265s]   By not providing "Findaction_msgs.cmake" in CMAKE_MODULE_PATH this project
+[4.266s]   has asked CMake to find a package configuration file provided by
+[4.267s]   "action_msgs", but CMake did not find one.
+[4.268s] 
+[4.269s]   Could not find a package configuration file provided by "action_msgs" with
+[4.270s]   any of the following names:
+[4.271s] 
+[4.273s]     action_msgsConfig.cmake
+[4.275s]     action_msgs-config.cmake
+[4.278s] 
+[4.279s]   Add the installation prefix of "action_msgs" to CMAKE_PREFIX_PATH or set
+[4.280s]   "action_msgs_DIR" to a directory containing one of the above files.  If
+[4.281s]   "action_msgs" provides a separate development package or SDK, be sure it
+[4.282s]   has been installed.
+[4.283s] 
+[4.286s] [0m
+[4.290s] -- Configuring incomplete, errors occurred!
+[4.291s] See also "/home/robotics/desktop_ws/IEEETurtleBot2/build/turtlebot3_msgs/CMakeFiles/CMakeOutput.log".

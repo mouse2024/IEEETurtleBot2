@@ -1,0 +1,32 @@
+[0.180s] Invoking command in '/home/robotics/desktop_ws/IEEETurtleBot2/build/dynamixel_sdk_custom_interfaces': /usr/bin/cmake /home/robotics/desktop_ws/IEEETurtleBot2/src/DynamixelSDK/ros/dynamixel_sdk_custom_interfaces -DCMAKE_INSTALL_PREFIX=/home/robotics/desktop_ws/IEEETurtleBot2/install/dynamixel_sdk_custom_interfaces
+[1.049s] -- The C compiler identification is GNU 11.4.0
+[1.739s] -- The CXX compiler identification is GNU 11.4.0
+[1.829s] -- Detecting C compiler ABI info
+[2.669s] -- Detecting C compiler ABI info - done
+[2.759s] -- Check for working C compiler: /usr/bin/cc - skipped
+[2.764s] -- Detecting C compile features
+[2.771s] -- Detecting C compile features - done
+[2.813s] -- Detecting CXX compiler ABI info
+[4.192s] -- Detecting CXX compiler ABI info - done
+[4.270s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[4.272s] -- Detecting CXX compile features
+[4.277s] -- Detecting CXX compile features - done
+[4.663s] [31mCMake Error at CMakeLists.txt:14 (find_package):
+[4.664s]   By not providing "Findament_cmake.cmake" in CMAKE_MODULE_PATH this project
+[4.665s]   has asked CMake to find a package configuration file provided by
+[4.666s]   "ament_cmake", but CMake did not find one.
+[4.667s] 
+[4.668s]   Could not find a package configuration file provided by "ament_cmake" with
+[4.669s]   any of the following names:
+[4.670s] 
+[4.671s]     ament_cmakeConfig.cmake
+[4.671s]     ament_cmake-config.cmake
+[4.672s] 
+[4.673s]   Add the installation prefix of "ament_cmake" to CMAKE_PREFIX_PATH or set
+[4.675s]   "ament_cmake_DIR" to a directory containing one of the above files.  If
+[4.676s]   "ament_cmake" provides a separate development package or SDK, be sure it
+[4.678s]   has been installed.
+[4.680s] 
+[4.681s] [0m
+[4.682s] -- Configuring incomplete, errors occurred!
+[4.683s] See also "/home/robotics/desktop_ws/IEEETurtleBot2/build/dynamixel_sdk_custom_interfaces/CMakeFiles/CMakeOutput.log".

@@ -23,9 +23,9 @@ void setup() {
 }
 
 void loop() {
-  //motorstep(100, 1);  // Up
+  motorstep(200, 1);  // Up
   turnServos(0);
-  motorstep(500, 0);  //Down
+  motorstep(200, 0);  //Down
   turnServos(1);
 }
 
@@ -53,6 +53,7 @@ void turnServos(int direction) {
       delay(15);
     }
   } else {
+    leftPos = 180;
     for (rightPos = 0; rightPos < 180; rightPos++) {
       leftServo.write(leftPos);
       rightServo.write(rightPos);

@@ -1,0 +1,2 @@
+Invoking command in '/home/robotics/desktop_ws/IEEETurtleBot2/build/dynamixel_sdk': /usr/bin/cmake /home/robotics/desktop_ws/IEEETurtleBot2/src/DynamixelSDK/ros/dynamixel_sdk -DCMAKE_INSTALL_PREFIX=/home/robotics/desktop_ws/IEEETurtleBot2/install/dynamixel_sdk
+Invoked command in '/home/robotics/desktop_ws/IEEETurtleBot2/build/dynamixel_sdk' returned '1': /usr/bin/cmake /home/robotics/desktop_ws/IEEETurtleBot2/src/DynamixelSDK/ros/dynamixel_sdk -DCMAKE_INSTALL_PREFIX=/home/robotics/desktop_ws/IEEETurtleBot2/install/dynamixel_sdk
