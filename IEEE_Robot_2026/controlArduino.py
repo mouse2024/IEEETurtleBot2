@@ -51,4 +51,5 @@ move_motor(250, 0)  # move 20 steps down
 time.sleep(2)
 #set_relay(False)    # turn relay OFF
 turn_servos(0)
+time.sleetp(2)
 turn_servos(1)
