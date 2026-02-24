@@ -1,5 +1,6 @@
+#include <Wire.h>
 #include <Arduino.h>
-#include <Servo.h>
+#include <Adafruit_PWMServoDriver.h>
 
 // Relay for Electromagnet
 #define RELAY_PIN 7
@@ -10,9 +11,10 @@
 #define STEP_1 4
 
 // Servos
-Servo leftServo;
-Servo rightServo;
-int servoPos = 0;
+AdafruitPWMServoDriver servos = Adafruit_PWMServoDriver();
+#define SERVOMIN 150  // This is the 'minimum' pulse length count (out of 4096)
+#define SERVOMAX 600  // This is the 'maximum' pulse length count (out of 4096)
+#define SERVO_FREQ 50
 
 void setup() {
   Serial.begin(115200);  // USB serial to Pi
@@ -26,11 +28,8 @@ void setup() {
   pinMode(STEP_1, OUTPUT);
   digitalWrite(ENA_1, LOW);
 
-  leftServo.write(90);  // Prevent servo from jumping (hopefully)
-  rightServo.write(90);
-  delay(50);
-  leftServo.attach(8);
-  rightServo.attach(9);
+  servos.begin();
+  servos.setPWMFreq(SERVO_FREQ);
 }
 
 void loop() {
@@ -87,14 +86,16 @@ void setRelay(int setting) {
 }
 
 void turnServos(int direction) {
-  for (servoPos = 0; servoPos < 180; servoPos++) {
-    if (direction == 0) {
-      leftServo.write(servoPos);
-      rightServo.write(180 - servoPos);
-    } else if (direction == 1) {
-      leftServo.write(180 - servoPos);
-      rightServo.write(servoPos);
+  if (direction == 0) {
+    for (int pulselen = SERVOMIN; pulselen < SERVOMAX; pulselen++) {
+      servos.setPWM(1, 0, pulselen);
+      servos.setPWM(2, 0, pulselen);
+      delay(15);
     }
-    delay(15);
+  } else if (direction == 1) {
+    for (int pulselen = SERVOMAX; pulselen > SERVOMIN; pulselen--) {
+      servos.setPWM(1, 0, pulselen);
+      servos.setPWM(2, 0, pulselen);
+      delay(15);
+    }
   }
-}
