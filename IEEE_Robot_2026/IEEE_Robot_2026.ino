@@ -11,7 +11,7 @@
 #define STEP_1 4
 
 // Servos
-AdafruitPWMServoDriver servos = Adafruit_PWMServoDriver();
+Adafruit_PWMServoDriver servos = Adafruit_PWMServoDriver();
 #define SERVOMIN 150  // This is the 'minimum' pulse length count (out of 4096)
 #define SERVOMAX 600  // This is the 'maximum' pulse length count (out of 4096)
 #define SERVO_FREQ 50
@@ -88,14 +88,15 @@ void setRelay(int setting) {
 void turnServos(int direction) {
   if (direction == 0) {
     for (int pulselen = SERVOMIN; pulselen < SERVOMAX; pulselen++) {
-      servos.setPWM(1, 0, pulselen);
-      servos.setPWM(2, 0, pulselen);
+      servos.setPWM(1, 0, SERVOMAX - pulselen);
+      servos.setPWM(0, 0, pulselen);
       delay(15);
     }
   } else if (direction == 1) {
-    for (int pulselen = SERVOMAX; pulselen > SERVOMIN; pulselen--) {
+    for (int pulselen = SERVOMIN; pulselen < SERVOMAX; pulselen++) {
       servos.setPWM(1, 0, pulselen);
-      servos.setPWM(2, 0, pulselen);
+      servos.setPWM(0, 0, SERVOMAX - pulselen);
       delay(15);
     }
   }
+}
