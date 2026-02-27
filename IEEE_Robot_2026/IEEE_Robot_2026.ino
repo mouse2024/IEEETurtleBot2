@@ -12,12 +12,23 @@
 
 // Servos
 Adafruit_PWMServoDriver servos = Adafruit_PWMServoDriver();
-#define SERVOMIN 150  // This is the 'minimum' pulse length count (out of 4096)
-#define SERVOMAX 600  // This is the 'maximum' pulse length count (out of 4096)
+#define SERVOMIN 100  // about 0 degrees
+#define SERVOMAX 500  // about 180 degrees
 #define SERVO_FREQ 50
+
+// Start Light Sensor
+#define PHOTOCELL 0
+#define LED 12
+int photocellReading; 
+bool start = false;
+int prevReading;
 
 void setup() {
   Serial.begin(115200);  // USB serial to Pi
+
+  pinMode(PHOTOCELL, INPUT);
+  pinMode(LED, OUTPUT);
+  digitalWrite(LED, HIGH);
 
   pinMode(RELAY_PIN, OUTPUT);
   digitalWrite(RELAY_PIN, LOW);  // relay off
@@ -28,6 +39,7 @@ void setup() {
   pinMode(STEP_1, OUTPUT);
   digitalWrite(ENA_1, LOW);
 
+  // Setup Servos
   servos.begin();
   servos.setPWMFreq(SERVO_FREQ);
   servos.setPWM(0, 0, SERVOMAX);
@@ -35,6 +47,13 @@ void setup() {
 }
 
 void loop() {
+  if (!start) {
+    photocellReading = analogRead(PHOTOCELL);
+    if (photocellReading  >= 500) {
+      start = true;
+      digitalWrite(LED, LOW);
+    }
+  }
   if (Serial.available()) {  // command byte + 2 data bytes
     if (Serial.read() == 0xFF) {
       while (Serial.available() < 3)
