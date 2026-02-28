@@ -10,6 +10,8 @@
 #define DIR_1 3
 #define STEP_1 4
 
+#define LIMIT_SWTICH 9
+
 // Servos
 Adafruit_PWMServoDriver servos = Adafruit_PWMServoDriver();
 #define SERVOMIN 100  // about 0 degrees
@@ -36,11 +38,12 @@ void setup() {
   pinMode(RELAY_PIN, OUTPUT);
   digitalWrite(RELAY_PIN, LOW);  // relay off
 
-  // Setup Stepper Motors
+  // Setup Stepper Motor
   pinMode(ENA_1, OUTPUT);
   pinMode(DIR_1, OUTPUT);
   pinMode(STEP_1, OUTPUT);
   digitalWrite(ENA_1, LOW);
+  pinMode(LIMIT_SWITCH, INPUT);
 
   // Setup Servos
   servos.begin();
@@ -66,12 +69,16 @@ void loop() {
           motorStep(data1, data2);  // 0 = down, 1 = up
           Serial.write(0xAA);
           break;
-        case 0x02:  // Relay
-          setRelay(data1);
+        case 0x02:
+          motorFull(data1);
           Serial.write(0xAA);
           break;
         case 0x03:  // Servos
           turnServos(data1);
+          Serial.write(0xAA);
+          break;
+        case 0x04:  // Relay
+          setRelay(data1);
           Serial.write(0xAA);
           break;
         default:
@@ -105,6 +112,15 @@ void motorStep(int numSteps, int direction) {
     delay(1);
     digitalWrite(STEP_1, LOW);
     delay(1);
+  }
+}
+
+void motorFull(int direction) {
+  if (direction = 0) {
+    bool moving = false;
+    while (!moving) {
+      digitalRead(LIMIT_SWITCH);
+    }
   }
 }
 
