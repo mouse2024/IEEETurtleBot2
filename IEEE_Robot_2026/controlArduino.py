@@ -29,7 +29,7 @@ def move_motor_full(direction: int):
     if direction not in (0,1): # 0 = down, 1 = up
         raise ValueError("Direciton must be 0 or +1.")
     ser.write(bytes([0xFF, 0x2, direction, 0x00]))
-    if ack == b\'xAA':
+    if ack == b'\xAA':
         print(f"Motor moved full distance")
     else:
         print("Error moving motor")
