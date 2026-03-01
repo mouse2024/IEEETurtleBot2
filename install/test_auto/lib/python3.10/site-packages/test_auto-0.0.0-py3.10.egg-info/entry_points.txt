@@ -1,6 +1,0 @@
-[console_scripts]
-comp_auto = test_auto.comp_auto:main
-map_go = mapAndGo.mapAndGo:main
-piPub = test_auto.piPub:main
-test_auto = test_auto.test_auto:main
-

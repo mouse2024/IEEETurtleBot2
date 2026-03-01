@@ -1,2 +1,0 @@
-mapAndGo
-test_auto
