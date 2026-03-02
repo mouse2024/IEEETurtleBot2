@@ -1,4 +1,4 @@
-~/desktop_ws/IEEETurtleBot2/install
-~/desktop_ws/IEEETurtleBot2/build
-~/desktop_ws/IEEETurtleBot2/log
+/install
+/build
+/log
 #for some reason this isn't working
