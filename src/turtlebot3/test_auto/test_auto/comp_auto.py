@@ -25,25 +25,16 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile
 
-rows, cols = (4, 8)
-field = [[0 for i in range(cols)] for j in range(rows)]
-field[3][2] = 1 #starting sqaure (there are obviously no astroids here, but whatever)
-
 ros_distro = os.environ.get('ROS_DISTRO', 'humble').lower()
 if ros_distro == 'humble':
     from geometry_msgs.msg import Twist as CmdVelMsg
 else:
     from geometry_msgs.msg import TwistStamped as CmdVelMsg
 
-terminal_msg = """
-TurtleBot3 Relative Move
-------------------------------------------------------
-From the current pose,
-x: goal position x (unit: m)
-y: goal position y (unit: m)
-theta: goal orientation (range: -180 ~ 180, unit: deg)
-------------------------------------------------------
-"""
+rows, cols = (4, 8)
+field = [[0 for i in range(cols)] for j in range(rows)]
+field[3][2] = 1 #starting sqaure (there are obviously no astroids here, but whatever)
+
 #I copied this class exactly from Michael's multicontrol mynode, idk where he got it from; used to hopefully help stop the idiot at the end
 class SigintSkipper:
     def __init__(self, callback):
@@ -58,70 +49,33 @@ class SigintSkipper:
 
     def __exit__(self, type, value, traceback):
         print('exiting sigint skipper')
-class Turtlebot3Path():
 
-    @staticmethod
-    def turn(angle, angular_velocity, step): #step is state machine counter i think
-        twist = CmdVelMsg()
-        angle = math.atan2(math.sin(angle), math.cos(angle)) #I swear this line is doing nothing
-
-        if abs(angle) > 0.05: #this was 0.01 but I made it less accurate
-            twist.angular.z = angular_velocity if angle > 0 else -angular_velocity
-        else:
-            step += 1
-
-        return twist, step
-
-    @staticmethod
-    def go_straight(distance, linear_velocity, step):
-        twist = CmdVelMsg()
-
-        if distance > 0.01:
-            twist.linear.x = linear_velocity  #apparently x is go forward to twist.
-        else:
-            step += 1
-
-        return twist, step
-
-
-<<<<<<< Updated upstream
 class Turtlebot3RelativeMove(Node):
-=======
+    def intom(inch): #inch to meter conversion, bc IEEE uses in and turtlebot uses m
+        return inch * 0.0254
+    def degtorad(deg):
+        return deg * 3.141592 / 180
+
     #I am not dealing with more python nonsense, just go with it
     #states = [(intom(12), 0, 0, "x"), (intom(12), 0, degtorad(-90), "theta"), (intom(12), intom(12), degtorad(-90), "y"), (intom(12), intom(12), degtorad(-180), "theta"), (0, intom(12), degtorad(-180), "x"), (0, intom(12), degtorad(90), "theta"), (0, 0, degtorad(90), "y"), (0, 0, 0, "theta")]
     state = 0
     states = [(intom(18), 0, 0, "x")]
->>>>>>> Stashed changes
 
-    def __init__(self): #python needs to specify self all over the place so that different objects of the same type are distinct
-        #scope? idk, here should be good
-        def intom(inch): #inch to meter conversion, bc IEEE uses in and turtlebot uses m
-            return inch * 0.0254
-        def degtorad(deg):
-            return deg * 3.141592 / 180
-
-        super().__init__('turtlebot3_relative_move') #its parent/super() is node
-
-        self.segment = 0 #idk when these numbers increase
-        #so you see, this obviously drives forward to the center line, rotates left, drives to the beacon mast, rotates right, and drives into the cave
-        self.segments = [(intom(12), 0, 0), #drives forward to center line
-                         (0, 0, degtorad(-90)), #rotate left
-                         (intom(36), 0, 0), #drive to beacon mast
-                         (0, 0, 3.14), #rotate right
-                         (intom(72), 0, 0), #drive into cave
-                         (intom(-20), 0, 0), #drive out of cave (TODO: slower so we don't lose elements?)
-                         (0, 0, degtorad(90)), #rotate right to face CSC
-                         (intom(12), 0, 0) #drive forward into the CSC
-                        ]
+    def __init__(self):
+        super().__init__('turtlebot3_relative_move')
 
         self.odom = Odometry()
         self.last_pose_x = 0.0
         self.last_pose_y = 0.0
-        self.last_pose_theta = 0.0 
+        self.last_pose_theta = 0.0
         self.goal_pose_x = 0.0
         self.goal_pose_y = 0.0
         self.goal_pose_theta = 0.0
-        self.step = 1
+        self.start_pose_x = 0.0
+        self.start_pose_y = 0.0
+        self.start_pose_theta = 0.0
+
+        self.odom_reset = False #I'm going to use this variable to reset odometry at the beginning of the code
         self.get_key_state = False # whether we have new user input to work off of
         self.init_odom_state = False # whether we have new odometry data to work off of
 
@@ -138,14 +92,10 @@ class Turtlebot3RelativeMove(Node):
         self.update_timer = self.create_timer(0.010, self.update_callback) #call that function every 0.01 seconds, i think it does start automatically, idk why it needs to go into a variable
 
         self.get_logger().info('TurtleBot3 relative move node has been initialised.') #log a message with INFO severity (into the log file i guess, you can find it somewhere in rviz? go ask the ros tutorial)
-
+    #this came from here https://stackoverflow.com/questions/74976911/create-an-odometry-publisher-node-in-python-ros2
+    #its gone, i dont think it worked
     #this sets of previous (current) position based on the odometry data (better hope its correct)
     def odom_callback(self, msg): #function called when we get data from odometry subscription
-<<<<<<< Updated upstream
-        self.last_pose_x = msg.pose.pose.position.x
-        self.last_pose_y = msg.pose.pose.position.y
-        _, _, self.last_pose_theta = self.euler_from_quaternion(msg.pose.pose.orientation) #changes how angles are represented, math smth smth
-=======
         #self.get_logger().info('odom calledback')
         if(not self.odom_reset): 
             self.start_pose_x = msg.pose.pose.position.x
@@ -160,106 +110,96 @@ class Turtlebot3RelativeMove(Node):
         self.last_pose_y = msg.pose.pose.position.y - self.start_pose_y
         #_, _, self.last_pose_theta = self.euler_from_quaternion(msg.pose.pose.orientation) #changes how angles are represented, math smth smth
         self.last_pose_theta = self.euler_from_quaternion(msg.pose.pose.orientation)[2] - self.start_pose_theta #ignore roll and pitch (though the fact that it can do that is good to keep in mind)
->>>>>>> Stashed changes
 
         self.init_odom_state = True #this tells us whether we should trust the data in last_pose
 
-        self.get_logger().info('current odom data: ' + str(msg.pose.pose.position.x)) #TODO: I think msg.pose.pose.position.x is an absolute position, let's see what format it is and how we can add it to the array
-        field[math.floor(msg.pose.pose.position.x / 12)][math.floor(msg.pose.pose.position.y / 12)] = 1 #TODO: where is 0??
-
     #if we have new odometry data, make a new path
     def update_callback(self): #called from the timer every 0.01 seconds
+        #self.get_logger().info('update calledback')
         if self.init_odom_state: #if we have updated odometry data
             self.generate_path()
 
-    #move in three steps based on user input
-    def generate_path(self): #called from update_callback called from the timer every 0.01 seconds
+    def generate_path(self):
         twist = CmdVelMsg() #the message we will eventually publish to move
-        if not self.init_odom_state: #if we don't have new odometry data, no reason to move
+        if self.state > len(self.states):
+            self.get_logger().info('no more states')
+            twist.linear.x = 0
+            twist.angular. z = 0
+        elif not self.init_odom_state: #if we don't have new odometry data, no reason to move
+            self.get_logger().info('no new odom')
             return
+        elif not self.get_key_state:
+            #self.goal_pose_x, self.goal_pose_y, self.goal_pose_theta = self.states[self.state][0:3]
+            input_x, input_y, input_theta = self.states[self.state][0:3]
 
-<<<<<<< Updated upstream
-        if not self.get_key_state: #if we don't have new user input, go ask for some (and it somehow waits until we get it, i guess stalls here? idk how interrupt works)
-            #input_x, input_y, input_theta = self.get_key() #get user input
-            #for i in range(len(self.segments)):
-            if(self.segment == 1):
-                self.get_logger().info('current segment: ' + str(1))
-                input_x, input_y, input_theta = self.segments[0]
-            elif (self.segment == 2):
-                self.get_logger().info('current segment: ' + str(2))
-                input_x, input_y, input_theta = self.segments[1]
-            elif (self.segment == 3):
-                self.get_logger().info('current segment: ' + str(3))
-                input_x, input_y, input_theta = self.segments[2]
-            elif (self.segment == 4):
-                self.get_logger().info('current segment: ' + str(4))
-                input_x, input_y, input_theta = self.segments[3]
-            else:
-                self.generate_stop()
-                return
-
-            input_x_global = ( #idk this math exactly
-                math.cos(self.last_pose_theta) * input_x - math.sin(self.last_pose_theta) * input_y
-=======
             '''self.get_logger().info('set goal poses')
             input_x_global = ( #converting local input into global frame (i guess this will help)
                 math.cos(self.start_pose_theta) * input_x - math.sin(self.start_pose_theta) * input_y
->>>>>>> Stashed changes
             )
             input_y_global = (
-                math.sin(self.last_pose_theta) * input_x + math.cos(self.last_pose_theta) * input_y
-                )
+                math.sin(self.start_pose_theta) * input_x + math.cos(self.start_pose_theta) * input_y
+            )
 
             self.goal_pose_x = self.last_pose_x + input_x_global
             self.goal_pose_y = self.last_pose_y + input_y_global
-<<<<<<< Updated upstream
-            self.goal_pose_theta = self.last_pose_theta + input_theta
-=======
             self.goal_pose_theta = self.last_pose_theta + input_theta'''
-            self.goal_pose_x = input_x - self.start_pose_x
-            self.goal_pose_y = input_y - self.start_pose_y
-            self.goal_pose_theta = input_theta - self.start_pose_theta #ignore roll and pitch (though the fact that it can do that is good to keep in mind)
+            self.goal_pose_x = input_x + self.start_pose_x
+            self.goal_pose_y = input_y + self.start_pose_y
+            self.goal_pose_theta = input_theta + self.start_pose_theta #ignore roll and pitch (though the fact that it can do that is good to keep in mind)
             self.get_logger().info('goal x' + str(self.goal_pose_x))
             self.get_logger().info('goal y' + str(self.goal_pose_y))
             self.get_logger().info('goal theta' + str(self.goal_pose_theta))
 
->>>>>>> Stashed changes
             self.get_key_state = True #this indicates if we have new user input to move based on
 
         else:
-            if self.step == 1 and self.segment < len(self.segments): #turn towards goal since we can't drive sideways
-                path_theta = math.atan2(
-                    self.goal_pose_y - self.last_pose_y,
-                    self.goal_pose_x - self.last_pose_x)
-                angle = path_theta - self.last_pose_theta
-                angular_velocity = 0.3
+            self.get_logger().info('array state ' + str(self.state))
+            self.get_logger().info('what should we do ' + str(self.states[self.state][3]))
+            #make goal between 0 and 2pi
+            if self.goal_pose_theta > 6.3: #does it really need to be while?
+                self.goal_pose_theta = self.goal_pose_theta - 6.28
+                self.get_logger().info('subtracted 2pi from goal')
+            if self.goal_pose_theta < -0.1:
+                self.goal_pose_theta = self.goal_pose_theta + 6.28
+                self.get_logger().info('added 2pi to goal')
+            #make current between 0 and 2pi
+            if self.last_pose_theta > 6.3: #does it really need to be while?
+                self.last_pose_theta = self.last_pose_theta - 6.28
+                self.get_logger().info('subtracted 2pi from last')
+            if self.last_pose_theta < -0.1:
+                self.last_pose_theta = self.last_pose_theta + 6.28
+                self.get_logger().info('added 2pi to last')
+            deltay = self.goal_pose_y - self.last_pose_y
+            deltax = self.goal_pose_x - self.last_pose_x
+            deltat = self.goal_pose_theta - self.last_pose_theta
+            #straight
+            if (self.states[self.state][3] == "y") and abs(deltay) > 0.1:
+                if (deltay > 0.1): #this may need to change for precision's sake
+                    twist.linear.x = -0.075 #change this for speed
+                    self.get_logger().info('y (goal, curr) ' + str(self.goal_pose_y) + ' ' + str(self.last_pose_y)) #add telemetry
+                elif (deltay < -0.1):
+                    twist.linear.x = 0.075 #apparently x is robot centric forward
+                    self.get_logger().info('-y (goal, curr) ' + str(self.goal_pose_y) + ' ' + str(self.last_pose_y))
 
-                self.get_logger().info('segment' + str(self.segment) + ' step1 ' + str(angle)[:4]) #add telemetry
+            elif (self.states[self.state][3] == "x") and abs(deltax) > 0.1:
+                if (deltax > 0.1): #this may need to change for precision's sake
+                    twist.linear.x = 0.075 #change this for speed
+                    self.get_logger().info('x (goal, curr) ' + str(self.goal_pose_x) + ' ' + str(self.last_pose_x)) #add telemetry
+                elif (deltax) < -0.1:
+                    twist.linear.x = -0.075
+                    self.get_logger().info('-x (goal, curr) ' + str(self.goal_pose_x) + ' ' + str(self.last_pose_x))
 
-                twist, self.step = Turtlebot3Path.turn(angle, angular_velocity, self.step)
-
-            elif self.step == 2 and self.segment < len(self.segments): #drive forward the distance to the goal
-                distance = math.sqrt(
-                    (self.goal_pose_x - self.last_pose_x)**2 +
-                    (self.goal_pose_y - self.last_pose_y)**2)
-                linear_velocity = 0.05
-
-                self.get_logger().info('segment' + str(self.segment) + 'step2' + str(distance)[:4]) #add telemetry
-
-                twist, self.step = Turtlebot3Path.go_straight(distance, linear_velocity, self.step)
-
-            elif self.step == 3 and self.segment < len(self.segments): #turn to goal heading
-                angle = self.goal_pose_theta - self.last_pose_theta
-                angular_velocity = 0.2
-
-                self.get_logger().info('segment' + str(self.segment) + 'step3' + str(angle)[:4]) #add telemetry
-
-                twist, self.step = Turtlebot3Path.turn(angle, angular_velocity, self.step)
-
-            elif self.step == 4: #restart, call the last user input invalid now since we already got there
-                self.step = 1
-                self.get_key_state = False
-                self.segment = self.segment + 1
+            #turn
+            elif (self.states[self.state][3] == "theta") and abs(deltat) > 0.1:
+                if deltat > 0.05: #this number may need to change
+                    twist.angular.z = 0.5 #can't flip this or it will oscillate around -1.5 (pi/2)
+                    self.get_logger().info('z (goal, curr) ' + str(self.goal_pose_theta) + ' ' + str(self.last_pose_theta))
+                elif deltat < -0.05: #if it drifted slightly, that's ok, we're ignoring that
+                    twist.angular.z = -0.5
+                    self.get_logger().info('-z (goal, curr) ' + str(self.goal_pose_theta) + ' ' + str(self.last_pose_theta))
+            else:
+                self.state = self.state + 1
+                self.get_key_state = False 
 
             if ros_distro == 'humble':
                 self.cmd_vel_pub.publish(twist)
@@ -268,66 +208,6 @@ class Turtlebot3RelativeMove(Node):
                 stamped.header.stamp = self.get_clock().now().to_msg()
                 stamped.twist = twist
                 self.cmd_vel_pub.publish(stamped)
-
-    def generate_stop(self): #Hannah's copy of generate_path() to make this fool stop
-        self.get_logger().info('generate stop is running')
-        twist = CmdVelMsg() #the message we will eventually publish to move
-        if not self.init_odom_state: #if we don't have new odometry data, no reason to move
-            return
-
-        if not self.get_key_state: #if we don't have new user input, go ask for some (and it somehow waits until we get it, i guess stalls here? idk how interrupt works)
-            #input_x, input_y, input_theta = self.get_key() #get user input
-
-            self.get_key_state = True #this indicates if we have new user input to move based on
-
-        else:
-            angle = self.last_pose_theta
-            angular_velocity = 0.0
-
-            self.get_logger().info('stop now')
-            twist, self.step = Turtlebot3Path.turn(angle, angular_velocity, self.step)
-
-            if ros_distro == 'humble':
-                self.cmd_vel_pub.publish(twist)
-            else:
-                stamped = CmdVelMsg()
-                stamped.header.stamp = self.get_clock().now().to_msg()
-                stamped.twist = twist
-                self.cmd_vel_pub.publish(stamped)
-
-
-    #gets terminal input, I won't have to worry about this bit XD
-    def get_key(self):
-        print(terminal_msg) #print directions to terminal
-        while True:
-            try:
-                input_x = float(input('Input x: ')) #input comes from stdin
-                break
-            except ValueError:
-                self.get_logger().info('Invalid input! Please enter a number for x.') #maybe logger prints to stdout somewhere?
-        while True:
-            try:
-                input_y = float(input('Input y: '))
-                break
-            except ValueError:
-                self.get_logger().info('Invalid input! Please enter a number for y.')
-        while True:
-            try:
-                input_theta = float(input('Input theta (deg): '))
-                if -180 <= input_theta <= 180:
-                    break
-                else:
-                    self.get_logger().info('Enter a value for theta between -180 and 180.')
-            except ValueError:
-                self.get_logger().info('Invalid input! Please enter a number for theta.')
-
-        input_theta = numpy.deg2rad(input_theta)
-
-        #something about controlling terminal inferface, idk where it links to/what is affects, doss here: https://www.man7.org/linux/man-pages/man3/termios.3.html
-        settings = termios.tcgetattr(sys.stdin)
-        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
-
-        return input_x, input_y, input_theta
 
     #converts angle representations, what fun.
     def euler_from_quaternion(self, quat):
@@ -349,14 +229,13 @@ class Turtlebot3RelativeMove(Node):
 
         return roll, pitch, yaw
 
-
 def main(args=None):
     rclpy.init(args=args) #just write this, idk or care what exactly it does
     node = Turtlebot3RelativeMove() #this calls init from above
 
-    #this code is all from Michael's multicontrol mynode
+    #this code is all from Michael's multicontrol mynode, except i moved it outside main()
     def finish_callback():
-        node.generate_stop()
+        #node.generate_stop()
         stop_twist = CmdVelMsg()
         node.cmd_vel_pub.publish(stop_twist) #publish an empty cmdVelMsg to stop
         node.destroy_node()
@@ -365,26 +244,6 @@ def main(args=None):
     with SigintSkipper(finish_callback):
         #threading.Thread(target=pyglet.app.run, args=tuple()).start() #I think this is just for controller input and i can ignore it
         rclpy.spin(node)
-'''
-    try:
-        rclpy.spin(node) #this starts callbacks including the timer i think, docs here: https://docs.ros2.org/latest/api/rclpy/api/init_shutdown.html
-
-    except KeyboardInterrupt or SystemExit:
-        node.generate_stop()
-        stop_twist = CmdVelMsg()
-        node.cmd_vel_pub.publish(stop_twist) #publish an empty cmdVelMsg to stop
-
-        node.destroy_node()
-        rclpy.shutdown()
-
-    finally: #idk when this is supposed to run, it doesn't interrupt the other code i think??; it doesn't work for me lol
-        node.generate_stop()
-        stop_twist = CmdVelMsg()
-        node.cmd_vel_pub.publish(stop_twist) #publish an empty cmdVelMsg to stop
-
-        node.destroy_node()
-        rclpy.shutdown()
-'''
 
 if __name__ == '__main__': #this just lives here in python
     main()
