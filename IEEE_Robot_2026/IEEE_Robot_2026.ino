@@ -12,6 +12,8 @@
 
 #define LIMIT_SWITCH 2
 bool limitTrigger = false;
+#define DEBOUNCE_DELAY 100
+unsigned long lastDebounceTime = 0;
 
 // Servos
 Adafruit_PWMServoDriver servos = Adafruit_PWMServoDriver();
@@ -26,10 +28,6 @@ Adafruit_PWMServoDriver servos = Adafruit_PWMServoDriver();
 int frontReading;
 int backReading;
 bool start = false;
-
-// Debouncing
-#define DEBOUNCE_DELAY 100
-unsigned long lastDebounceTime = 0;
 
 void setup() {
   Serial.begin(115200);  // USB serial to Pi
@@ -62,6 +60,9 @@ void setup() {
 void loop() {
   if (!start) {
     start = startLED();
+  }
+  if (!limitTrigger) {
+    Serial.println("frog");
   }
   if (Serial.available()) {  // command byte + 2 data bytes
     if (Serial.read() == 0xFF) {
@@ -114,7 +115,7 @@ void motorStep(int numSteps, int direction) {
     digitalWrite(DIR_1, HIGH);
   }
 
-  for (int i = 0; i < numSteps * 10; i++) {
+  for (int i = 0; i < (numSteps * 5); i++) {
     digitalWrite(STEP_1, HIGH);
     delay(1);
     digitalWrite(STEP_1, LOW);
@@ -123,9 +124,9 @@ void motorStep(int numSteps, int direction) {
 }
 
 void motorFull(int direction) {
-  if (direction = 0) {
+  if (direction == 0) {
     digitalWrite(DIR_1, LOW);
-    while (digitalRead(LIMIT_SWITCH) == LOW) {
+    while (!limitTrigger) {
       digitalWrite(STEP_1, HIGH);
       delay(1);
       digitalWrite(STEP_1, LOW);
