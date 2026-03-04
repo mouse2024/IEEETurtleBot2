@@ -35,8 +35,8 @@ def move_motor_full(direction: int):
         print("Error moving motor")
 
 def turn_servos(direction: int):
-    if direction not in (0,1):
-        raise ValueError ("Direction must be 0 or +1");
+    if direction not in (0,2):
+        raise ValueError ("Direction must be 0 or +1 or +2 (in and out)");
     ser.write(bytes([0xFF, 0x03, direction, 0x00]))
     ack = ser.read()
     if ack == b'\xAA':

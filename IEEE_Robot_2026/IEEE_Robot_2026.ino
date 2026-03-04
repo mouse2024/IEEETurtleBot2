@@ -114,7 +114,7 @@ void motorStep(int numSteps, int direction) {
     digitalWrite(DIR_1, HIGH);
   }
 
-  for (int i = 0; i < numSteps; i++) {
+  for (int i = 0; i < numSteps * 10; i++) {
     digitalWrite(STEP_1, HIGH);
     delay(1);
     digitalWrite(STEP_1, LOW);
@@ -149,6 +149,12 @@ void turnServos(int direction) {
     servos.setPWM(0, 0, SERVOMIN);
     servos.setPWM(1, 0, SERVOMAX);
   } else if (direction == 1) {
+    servos.setPWM(0, 0, SERVOMAX);
+    servos.setPWM(1, 0, SERVOMIN);
+  } else if (direction == 2) {
+    servos.setPWM(0, 0, SERVOMIN);
+    servos.setPWM(1, 0, SERVOMAX);
+    delay(500);
     servos.setPWM(0, 0, SERVOMAX);
     servos.setPWM(1, 0, SERVOMIN);
   }
