@@ -118,7 +118,7 @@ class StaticFramePublisher(Node):
             t = TransformStamped()
 
             t.header.stamp = self.get_clock().now().to_msg()
-            t.header.frame_id = 'base_link'
+            t.header.frame_id = 'odom'
             t.child_frame_id = 'robot_start'
 
             t.transform.translation.x = self.last_pose_x

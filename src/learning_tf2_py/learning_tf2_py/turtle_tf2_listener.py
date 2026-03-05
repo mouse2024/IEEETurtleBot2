@@ -35,17 +35,14 @@ class FrameListener(Node):
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
 
-        #TODO: Create turtle2 velocity publisher
-        self.publisher = self.create_publisher(Twist, 'turtle2/cmd_vel', 1)
-
         # Call on_timer function every second
         self.timer = self.create_timer(1.0, self.on_timer)
 
     def on_timer(self):
         # Store frame names in variables that will be used to
         # compute transformations
-        from_frame_rel = 'odom'
-        to_frame_rel = 'robot_start' #TODO: should these be swapped
+        from_frame_rel = 'robot_start'
+        to_frame_rel = 'odom' #TODO: should these be swapped
                 
         # Look up for the transformation between robot_start and odom frames
         # and send velocity commands for odom to reach robot_start

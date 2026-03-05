@@ -25,6 +25,10 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile
 
+from tf2_ros import TransformException
+from tf2_ros.buffer import Buffer
+from tf2_ros.transform_listener import TransformListener
+
 ros_distro = os.environ.get('ROS_DISTRO', 'humble').lower()
 if ros_distro == 'humble':
     from geometry_msgs.msg import Twist as CmdVelMsg
@@ -102,6 +106,12 @@ class Turtlebot3RelativeMove(Node):
             self.odom_callback,
             qos) #message type, topic name, function called when a message is received, qos see above
 
+        # Declare and acquire `target_frame` parameter
+        self.target_frame = self.declare_parameter(
+            'robot_start', 'base_link').get_parameter_value().string_value
+        self.tf_buffer = Buffer()
+        self.tf_listener = TransformListener(self.tf_buffer, self)
+
         self.update_timer = self.create_timer(0.010, self.update_callback) #call that function every 0.01 seconds, i think it does start automatically, idk why it needs to go into a variable
 
         self.get_logger().info('TurtleBot3 relative move node has been initialised.') #log a message with INFO severity (into the log file i guess, you can find it somewhere in rviz? go ask the ros tutorial)
@@ -138,8 +148,8 @@ class Turtlebot3RelativeMove(Node):
             self.get_logger().info('no new odom')
             return
         elif not self.get_key_state:
-            self.goal_pose_x, self.goal_pose_y, self.goal_pose_theta = self.states[self.state][0:3]
-            #input_x, input_y, input_theta = self.states[self.state][0:3]
+            #self.goal_pose_x, self.goal_pose_y, self.goal_pose_theta = self.states[self.state][0:3]
+            input_x, input_y, input_theta = self.states[self.state][0:3]
 
             '''self.get_logger().info('set goal poses')
             input_x_global = ( #converting local input into global frame (i guess this will help)
@@ -158,8 +168,24 @@ class Turtlebot3RelativeMove(Node):
             self.goal_pose_theta = input_theta - self.start_pose_theta '''
 
             #self.goal_pose_x, self.goal_pose_y, self.goal_pose_theta = self.worldtostart(input_x, input_y, input_theta)
+            try: 
+                #lookup transform between robot_start and odom
+                t = self.tf_buffer.lookup_transform(
+                    'odom', #to frame rel (target frame)
+                    'robot_start', #from frame rel (source frame)
+                    rclpy.time.Time())
+                self.get_logger().info(str(t))
+            except TransformException as ex:
+                self.get_logger().info(
+                    f'Could not transform: {ex}')
+                return
+            
+            self.goal_pose_x = input_x + t.transform.translation.x
+            self.goal_pose_y = input_y + t.transform.translation.y
+            self.goal_pose_theta = input_theta + self.euler_from_quaternion(t.transform.rotation)[2]
 
-            #self.get_logger().info('input data ' + str(input_x) + " " + str(input_y) + ' ' + str(input_theta))
+            self.get_logger().info('input data ' + str(input_x) + " " + str(input_y) + ' ' + str(input_theta))
+            self.get_logger().info('trans data ' + str(t.transform.translation.x) + " " + str(t.transform.translation.y) + ' ' + str(self.euler_from_quaternion(t.transform.rotation)[2]))
             self.get_logger().info('mathd data ' + str(self.goal_pose_x) + " " + str(self.goal_pose_y) + ' ' + str(self.goal_pose_theta))
 
             self.get_key_state = True #this indicates if we have new user input to move based on
