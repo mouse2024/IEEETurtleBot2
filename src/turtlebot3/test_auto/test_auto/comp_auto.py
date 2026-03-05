@@ -56,10 +56,22 @@ class Turtlebot3RelativeMove(Node):
     def degtorad(deg):
         return deg * 3.141592 / 180
 
+    def worldtostart(self, x, y, theta):
+        x = x + self.start_pose_x
+        y = y + self.start_pose_y
+        theta = theta + self.start_pose_theta
+        return (x, y, theta)
+    
+    def starttoworld(self, x, y, theta):
+        x = self.start_pose_x - x
+        y = self.start_pose_y - y
+        theta = self.start_pose_theta - theta
+        return (x, y, theta)
+
     #I am not dealing with more python nonsense, just go with it
     #states = [(intom(12), 0, 0, "x"), (intom(12), 0, degtorad(-90), "theta"), (intom(12), intom(12), degtorad(-90), "y"), (intom(12), intom(12), degtorad(-180), "theta"), (0, intom(12), degtorad(-180), "x"), (0, intom(12), degtorad(90), "theta"), (0, 0, degtorad(90), "y"), (0, 0, 0, "theta")]
     state = 0
-    states = [(0, 0, degtorad(90), "theta")]
+    states = [(intom(12), 0, 0, "x")]
 
     def __init__(self):
         super().__init__('turtlebot3_relative_move')
@@ -96,18 +108,16 @@ class Turtlebot3RelativeMove(Node):
     #its gone, i dont think it worked
     #this sets of previous (current) position based on the odometry data (better hope its correct)
     def odom_callback(self, msg): #function called when we get data from odometry subscription
-        #self.get_logger().info('odom calledback')
         if(not self.odom_reset): 
             self.start_pose_x = msg.pose.pose.position.x
             self.start_pose_y = msg.pose.pose.position.y
             self.start_pose_theta = self.euler_from_quaternion(msg.pose.pose.orientation)[2]
             self.odom_reset = True
 
-        self.last_pose_x = msg.pose.pose.position.x - self.start_pose_x
-        self.last_pose_y = msg.pose.pose.position.y - self.start_pose_y
-        #_, _, self.last_pose_theta = self.euler_from_quaternion(msg.pose.pose.orientation) #changes how angles are represented, math smth smth
-        self.last_pose_theta = self.euler_from_quaternion(msg.pose.pose.orientation)[2] - self.start_pose_theta #ignore roll and pitch (though the fact that it can do that is good to keep in mind)
+        self.last_pose_x, self.last_pose_y, self.last_pose_theta = self.starttoworld(msg.pose.pose.position.x, msg.pose.pose.position.y, self.euler_from_quaternion(msg.pose.pose.orientation)[2])
 
+        self.get_logger().info('msg data ' + str(msg.pose.pose.position.x) + " " + str(msg.pose.pose.position.y) + ' ' + str(self.euler_from_quaternion(msg.pose.pose.orientation)[2]))
+        self.get_logger().info('mtd data ' + str(self.last_pose_x) + " " + str(self.last_pose_y) + ' ' + str(self.last_pose_theta))
         self.init_odom_state = True #this tells us whether we should trust the data in last_pose
 
     #if we have new odometry data, make a new path
@@ -126,10 +136,10 @@ class Turtlebot3RelativeMove(Node):
             self.get_logger().info('no new odom')
             return
         elif not self.get_key_state:
-            #self.goal_pose_x, self.goal_pose_y, self.goal_pose_theta = self.states[self.state][0:3]
-            input_x, input_y, input_theta = self.states[self.state][0:3]
+            self.goal_pose_x, self.goal_pose_y, self.goal_pose_theta = self.states[self.state][0:3]
+            #input_x, input_y, input_theta = self.states[self.state][0:3]
 
-            self.get_logger().info('set goal poses')
+            '''self.get_logger().info('set goal poses')
             input_x_global = ( #converting local input into global frame (i guess this will help)
                 math.cos(self.start_pose_theta) * input_x - math.sin(self.start_pose_theta) * input_y
             )
@@ -140,6 +150,15 @@ class Turtlebot3RelativeMove(Node):
             self.goal_pose_x = self.last_pose_x + input_x_global
             self.goal_pose_y = self.last_pose_y + input_y_global
             self.goal_pose_theta = self.last_pose_theta + input_theta
+
+            self.goal_pose_x = input_x - self.start_pose_x
+            self.goal_pose_y = input_y - self.start_pose_y
+            self.goal_pose_theta = input_theta - self.start_pose_theta '''
+
+            #self.goal_pose_x, self.goal_pose_y, self.goal_pose_theta = self.worldtostart(input_x, input_y, input_theta)
+
+            #self.get_logger().info('input data ' + str(input_x) + " " + str(input_y) + ' ' + str(input_theta))
+            self.get_logger().info('mathd data ' + str(self.goal_pose_x) + " " + str(self.goal_pose_y) + ' ' + str(self.goal_pose_theta))
 
             self.get_key_state = True #this indicates if we have new user input to move based on
 
@@ -160,6 +179,7 @@ class Turtlebot3RelativeMove(Node):
             if self.last_pose_theta < -0.1:
                 self.last_pose_theta = self.last_pose_theta + 6.28
                 self.get_logger().info('added 2pi to last')
+            
             deltay = self.goal_pose_y - self.last_pose_y
             deltax = self.goal_pose_x - self.last_pose_x
             deltat = self.goal_pose_theta - self.last_pose_theta
