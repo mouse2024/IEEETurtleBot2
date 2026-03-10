@@ -81,7 +81,7 @@ class Turtlebot3RelativeMove(Node):
     #I am not dealing with more python nonsense, just go with it
     #states = [(intom(12), 0, 0, "x"), (intom(12), 0, degtorad(-90), "theta"), (intom(12), intom(12), degtorad(-90), "y"), (intom(12), intom(12), degtorad(-180), "theta"), (0, intom(12), degtorad(-180), "x"), (0, intom(12), degtorad(90), "theta"), (0, 0, degtorad(90), "y"), (0, 0, 0, "theta")]
     state = 0
-    states = [(intom(12), 0, 0, "x")]
+    states = [(0, 0, degtorad(-90), "theta")]
 
     def __init__(self):
         super().__init__('turtlebot3_relative_move')
