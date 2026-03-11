@@ -53,6 +53,12 @@ TRAJECTORY_BUILDER_2D.use_imu_data = false
 TRAJECTORY_BUILDER_2D.use_online_correlative_scan_matching = true 
 TRAJECTORY_BUILDER_2D.motion_filter.max_angle_radians = math.rad(0.1)
 
+TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher = {
+  linear_search_window = 0.1,
+  angular_search_window = math.rad(1.)
+}
+
+
 POSE_GRAPH.constraint_builder.min_score = 0.65
 POSE_GRAPH.constraint_builder.global_localization_min_score = 0.7
 
