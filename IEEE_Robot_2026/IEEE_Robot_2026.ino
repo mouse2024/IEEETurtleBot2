@@ -71,9 +71,9 @@ void loop() {
   if (!start) {
     start = startLED();
   }
-  if (!limitTrigger) {
-    Serial.println("frog");
-  }
+  // if (!limitTrigger) {
+  //   Serial.println("frog");
+  // }
   if (Serial.available()) {  // command byte + 2 data bytes
     if (Serial.read() == 0xFF) {
       while (Serial.available() < 3)
@@ -92,7 +92,7 @@ void loop() {
           Serial.write(0xAA);
           break;
         case 0x03:  // Linear Actuators
-          tiltRobot(data1);
+          turnServos(data1);
           Serial.write(0xAA);
           break;
         case 0x04:  // Relay
@@ -166,8 +166,8 @@ void turnServos(int direction) {
     servos.setPWM(0, 0, SERVOMIN);
     servos.setPWM(1, 0, SERVOMAX);
   } else if (direction == 1) {
-    servos.setPWM(0, 0, SERVOMAX);
-    servos.setPWM(1, 0, SERVOMIN);
+    servos.setPWM(0, 0, 375);
+    servos.setPWM(1, 0, 375);
   } else if (direction == 2) {
     servos.setPWM(0, 0, SERVOMIN);
     servos.setPWM(1, 0, SERVOMAX);

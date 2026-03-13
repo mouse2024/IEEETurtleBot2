@@ -2,7 +2,7 @@ import serial
 import time
 
 # --- Setup serial port ---
-arduino_port = "/dev/ttyACM2"
+arduino_port = "/dev/ttyACM0"
 baud_rate = 115200
 ser = serial.Serial(arduino_port, baud_rate, timeout=1)
 
@@ -56,9 +56,7 @@ def set_relay(on: bool):
 move_motor(250, 1)  # move 1000 steps up
 time.sleep(2)
 move_motor(250, 0)  # move 20 steps down
-#set_relay(True)     # turn relay ON
 time.sleep(2)
-#set_relay(False)    # turn relay OFF
 turn_servos(0)
 time.sleep(2)
 turn_servos(1)
