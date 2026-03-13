@@ -16,6 +16,10 @@ class ScanFilter(Node):
         qos = QoSProfile(depth=10)
         qos.reliability = ReliabilityPolicy.BEST_EFFORT
 
+
+        qos1 = QoSProfile(depth=10)
+        qos1.reliability = ReliabilityPolicy.RELIABLE
+
         self.scan_sub = self.create_subscription(
             LaserScan,
             '/scan',
@@ -26,7 +30,7 @@ class ScanFilter(Node):
         self.scan_pub = self.create_publisher(
             LaserScan,
             '/scan_filtered',
-            qos
+            qos1
         )
 
         self.get_logger().info('Scan filter node started')

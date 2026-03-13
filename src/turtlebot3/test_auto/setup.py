@@ -24,7 +24,11 @@ setup(
 	    'piPub = test_auto.piPub:main',
 	    'comp_auto = test_auto.comp_auto:main',
         'scan_filter = test_auto.scan_filter:main',
-        'map_go = mapAndGo.mapAndGo:main'
+        'map_go = mapAndGo.mapAndGo:main',
+        'forward_back_auto = test_auto.forward_back_auto:main',
+        'everything = test_auto.everything:main',
+        'goToGoal = test_auto.goToGoal:main',
+        'tf_pub = test_auto.tf_pub:main'
         ],
     },
 )

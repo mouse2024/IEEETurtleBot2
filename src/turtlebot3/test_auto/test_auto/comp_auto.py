@@ -59,7 +59,7 @@ class Turtlebot3RelativeMove(Node):
     #I am not dealing with more python nonsense, just go with it
     #states = [(intom(12), 0, 0, "x"), (intom(12), 0, degtorad(-90), "theta"), (intom(12), intom(12), degtorad(-90), "y"), (intom(12), intom(12), degtorad(-180), "theta"), (0, intom(12), degtorad(-180), "x"), (0, intom(12), degtorad(90), "theta"), (0, 0, degtorad(90), "y"), (0, 0, 0, "theta")]
     state = 0
-    states = [(0, 0, degtorad(120), "theta"), (0, 0, degtorad(240), "theta"), (0, 0, degtorad(360), "theta")]
+    states = [(0, 0, degtorad(120), "theta"), (0, 0, degtorad(240), "theta"), (0, 0, degtorad(360), "theta"), (0, 0, degtorad(90), "theta")]
 
     def __init__(self):
         super().__init__('turtlebot3_relative_move')
@@ -181,11 +181,11 @@ class Turtlebot3RelativeMove(Node):
                     self.get_logger().info('-x (goal, curr) ' + str(self.goal_pose_x) + ' ' + str(self.last_pose_x))
 
             #turn
-            elif (self.states[self.state][3] == "theta") and abs(deltat) > 0.05:
-                if deltat > 0.05: #this number may need to change
-                    twist.angular.z = 0.25 #can't flip this or it will oscillate around -1.5 (pi/2)
+            elif (self.states[self.state][3] == "theta") and abs(deltat) > 0.1:
+                if deltat > 0.1: #this number may need to change
+                    twist.angular.z = 0.25 #positive is counterclockwise
                     self.get_logger().info('z (goal, curr) ' + str(self.goal_pose_theta) + ' ' + str(self.last_pose_theta))
-                elif deltat < -0.05: #if it drifted slightly, that's ok, we're ignoring that
+                elif deltat < -0.1: #if it drifted slightly, that's ok, we're ignoring that
                     twist.angular.z = -0.25
                     self.get_logger().info('-z (goal, curr) ' + str(self.goal_pose_theta) + ' ' + str(self.last_pose_theta))
             else:
