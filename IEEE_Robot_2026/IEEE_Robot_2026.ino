@@ -3,7 +3,8 @@
 #include <Adafruit_PWMServoDriver.h>
 
 // Relay for Electromagnet
-#define RELAY_PIN 7
+#define RELAY_PIN_L 8
+#define RELAY_PIN_R 9
 
 //Stepper Motors
 #define ENA_1 7
@@ -46,8 +47,10 @@ void setup() {
   digitalWrite(LED, HIGH);
 
 
-  pinMode(RELAY_PIN, OUTPUT);
-  digitalWrite(RELAY_PIN, LOW);  // relay off
+  pinMode(RELAY_PIN_L, OUTPUT);
+  pinMode(RELAY_PIN_R, OUTPUT);
+  digitalWrite(RELAY_PIN_L, LOW);  // relay off
+  digitalWrite(RELAY_PIN_R, LOW);
 
   // Setup Stepper Motor
   pinMode(ENA_1, OUTPUT);
@@ -88,8 +91,8 @@ void loop() {
           motorFull(data1);
           Serial.write(0xAA);
           break;
-        case 0x03:  // Servos
-          turnServos(data1);
+        case 0x03:  // Linear Actuators
+          tiltRobot(data1);
           Serial.write(0xAA);
           break;
         case 0x04:  // Relay
@@ -144,11 +147,17 @@ void motorFull(int direction) {
   }
 }
 
-void setRelay(int setting) {
+void tiltRobot(int setting) {
   if (setting == 0x00) {
-    digitalWrite(RELAY_PIN, LOW);  // OFF
+    digitalWrite(RELAY_PIN_L, LOW);  // OFF
+    digitalWrite(RELAY_PIN_R, LOW);
   } else if (setting == 0x01) {
-    digitalWrite(RELAY_PIN, HIGH);  // ON
+    digitalWrite(RELAY_PIN_L, HIGH);  // EXTRACT or RETRACT (not sure yet lol)
+    digitalWrite(RELAY_PIN_R, LOW);
+  } else if (Setting == 0x02) {
+    digitalWrite(RELAY_PIN_L, LOW);  // EXTRACT or RETRACT (not sure yet lol)
+    digitalWrite(RELAY_PIN_R, HIGH);
+
   }
 }
 
