@@ -87,12 +87,12 @@ def main(args=None):
     minimal_publisher = MinimalPublisher()
     node = GoToPoint() 
 
-    rclpy.spin(minimal_publisher)
+    rclpy.spin_once(minimal_publisher)
 
     future = node.go(-0.36, 0.55, numpy.pi/2)   # m, m, rad 
     rclpy.spin_until_future_complete(node, future) 
     
-    '''my rotate code would work better here
+    '''my rotate code from test auto would work better here
     future = node.go(-0.36, 0.55, 3*(numpy.pi/2))   # m, m, rad 
     rclpy.spin_until_future_complete(node, future) 
     '''
