@@ -1,19 +1,20 @@
+#Master Code 
+#Orkun KESKİN Jan 2022
+
 import spidev
+import time
+#SPI Bus and CE pin selection 
+spi_bus=0
+spi_device=0
 
-spi_bus = 0
-spi_device = 0
-
+#SPI activating
 spi = spidev.SpiDev()
-spi.open(spi_bus, spi_device)
-spi.max_speed_hz = 1000000
+spi.open(spi_bus,spi_device)
+#Transmitting speed is 1Mbps
+spi.max_speed_hz=1000000
 
-# Send a null byte to check for value
-send_byte = 0x80
-rcv_byte = spi.xfer2([send_byte])
-
-# repeat to check for a response
-rcv_byte = spi.xfer2([send_byte])
-data_recv = rcv_byte[0]
-if (data_recv != 0x80):
-    print ("Unable to communicate with Arduino "+str(data_recv))
-    quit()
+#Sending Sequence
+while True:
+    send_byte = 0x05  #Sent byte to the Receiver from Transmitter
+    spi.xfer2([send_byte])
+    time.sleep(0.5)  #Delay for Arduino's register, it may be 0.25
